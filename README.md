@@ -31,3 +31,13 @@ docker-compose up -d
 make rate_limit_test_success
 make rate_limit_test_exceed_limit
 ```
+
+#### API
+**/pages**
+
+Content-Type: **application/json**
+
+Body example
+```json
+["http://localhost:8080"]
+```
