@@ -1,0 +1,11 @@
+version: "3"
+
+services:
+  app:
+    image: fanyshu/http-multiplexor:master
+    ports:
+    - 8080:8080
+    environment:
+      PORT: 8080
+      HANDLE_RATE_LIMIT: 100
+      CLIENT_REQUEST_RATE_LIMIT: 4
