@@ -97,14 +97,12 @@ func (f *pageFetcher) fetch(ctx context.Context, url string) {
 		close(done)
 	}()
 
-	for {
-		select {
-		case <-ctx.Done():
-			client.CloseIdleConnections()
-			return
-		case <-done:
-			return
-		}
+	select {
+	case <-ctx.Done():
+		client.CloseIdleConnections()
+		return
+	case <-done:
+		return
 	}
 }
 
