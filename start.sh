@@ -1,0 +1,1 @@
+eval $(cat ./.env.example | xargs -0) go run --race ./cmd

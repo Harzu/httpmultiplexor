@@ -20,4 +20,4 @@ rate_limit_test_success:
 	@vegeta attack -duration=10s -rate=5 -targets=vegeta.conf | vegeta report
 
 rate_limit_test_exceed_limit:
-	@vegeta attack -duration=10s -rate=95 -workers=1 -targets=vegeta.conf | vegeta report
+	@vegeta attack -duration=10s -rate=85 -workers=1 -targets=vegeta.conf | vegeta report

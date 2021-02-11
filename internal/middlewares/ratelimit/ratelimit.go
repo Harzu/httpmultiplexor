@@ -2,7 +2,7 @@ package ratelimit
 
 import (
 	"net/http"
-	"sync"
+	"sync/atomic"
 )
 
 type Middleware interface {
@@ -10,30 +10,25 @@ type Middleware interface {
 }
 
 type rateLimitMiddleware struct {
-	mu        *sync.RWMutex
 	limit     int
 	rateCount int32
 }
 
 func NewRateLimitMiddleware(limit int) Middleware {
 	return &rateLimitMiddleware{
-		mu:    &sync.RWMutex{},
 		limit: limit,
 	}
 }
 
 func (m *rateLimitMiddleware) RateLimitMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		m.mu.RLock()
-		defer m.mu.RUnlock()
-
-		if m.rateCount > int32(m.limit) {
-			http.Error(w, "exceeded rate limit", http.StatusInternalServerError)
+		if atomic.LoadInt32(&m.rateCount) > int32(m.limit) {
+			http.Error(w, "exceeded rate limit", http.StatusTooManyRequests)
 			return
 		}
 
-		m.rateCount++
+		atomic.AddInt32(&m.rateCount, 1)
 		next.ServeHTTP(w, r)
-		m.rateCount--
+		atomic.AddInt32(&m.rateCount, -1)
 	})
 }

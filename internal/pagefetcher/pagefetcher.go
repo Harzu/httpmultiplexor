@@ -68,9 +68,13 @@ func (f *pageFetcher) fetch(ctx context.Context, url string) {
 	log.Printf("start process url: %s", url)
 
 	done := make(chan struct{}, 1)
-	client := &http.Client{Timeout: 1 * time.Second}
+	client := &http.Client{Timeout: 10 * time.Second}
 
 	go func() {
+		defer func() {
+			done <- struct{}{}
+		}()
+
 		resp, err := client.Get(url)
 		if err != nil {
 			f.errChan <- fmt.Errorf("failed to send request: %w", err)
@@ -92,9 +96,6 @@ func (f *pageFetcher) fetch(ctx context.Context, url string) {
 			Url:     url,
 			Payload: string(respBytes),
 		}
-
-		done <- struct{}{}
-		close(done)
 	}()
 
 	select {
